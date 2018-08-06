@@ -3,28 +3,44 @@
 import Chart from 'chart.js';
 
 // TODO: options: bar color, bar width
+// TODO: add animations to error bars
 
 const ErrorBarsPlugin = {
   id: 'chartJsPluginErrorBars',
 
-  _drawErrorBar(ctx, model, value) {
+  _drawErrorBar(ctx, model, plus, minus, horizontal) {
     ctx.save();
     ctx.strokeStyle = model.color;
     ctx.beginPath();
-    ctx.moveTo(model.x, model.y);
-    ctx.lineTo(model.x, model.y - value);
-    ctx.moveTo(model.x - 5, model.y - value);
-    ctx.lineTo(model.x + 5, model.y - value);
-    ctx.stroke();
+    if (horizontal) {
+      ctx.moveTo(model.x + minus, model.y - 5);
+      ctx.lineTo(model.x + minus, model.y + 5);
+      ctx.moveTo(model.x + minus, model.y);
+      ctx.lineTo(model.x + plus, model.y);
+      ctx.moveTo(model.x + plus, model.y - 5);
+      ctx.lineTo(model.x + plus, model.y + 5);
+      ctx.stroke();
+    } else {
+      ctx.moveTo(model.x - 5, model.y - plus);
+      ctx.lineTo(model.x + 5, model.y - plus);
+      ctx.moveTo(model.x, model.y - plus);
+      ctx.lineTo(model.x, model.y - minus);
+      ctx.moveTo(model.x - 5, model.y - minus);
+      ctx.lineTo(model.x + 5, model.y - minus);
+      ctx.stroke();
+    }
     ctx.restore();
   },
 
-  beforeUpdate(chart) {
-
+  _isHorizontal(chart) {
+    return chart.config.type === 'horizontalBar';
   },
 
   afterDatasetsDraw(chart, easing) {
-    var yScale = chart.scales['y-axis-0'];
+    // determine value scale and direction (vert/hor)
+    var horizontal = this._isHorizontal(chart);
+    var vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
+
     var ctx = chart.ctx;
     ctx.save();
 
@@ -35,7 +51,7 @@ const ErrorBarsPlugin = {
       barCoords.push(bars.map((b, j) => {
         let barLabel = '';
 
-        // line charts do not have labels so the error bars cant be mapped
+        // line charts do not have labels in their meta data, access global label array instead
         if (!b._model.label) {
           barLabel = chart.data.labels[j];
         } else {
@@ -52,24 +68,20 @@ const ErrorBarsPlugin = {
 
     barCoords.forEach((dataset, i) => {
       dataset.forEach((b) => {
-        // is not hierarchical
         let hasErrorBar = errorBars[i].hasOwnProperty(b.label);
-
         let errorBarData = null;
         if (hasErrorBar) {
           errorBarData = errorBars[i][b.label];
         }
-        // is hierarchical
+        // hierarchical has its label attribute nested
         if (!hasErrorBar && b.label && b.label.label && errorBars[i].hasOwnProperty(b.label.label)) {
           errorBarData = errorBars[i][b.label.label];
         }
 
         if (errorBarData) {
-          var plus = yScale.getRightValue(errorBarData.plus);
-          var minus = yScale.getRightValue(errorBarData.minus);
-
-          this._drawErrorBar(ctx, b, plus);
-          this._drawErrorBar(ctx, b, minus);
+          var plus = vScale.getRightValue(errorBarData.plus);
+          var minus = vScale.getRightValue(errorBarData.minus);
+          this._drawErrorBar(ctx, b, plus, minus, horizontal);
         }
       });
     });
