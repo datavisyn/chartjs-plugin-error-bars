@@ -2,15 +2,22 @@
 
 import Chart from 'chart.js';
 
-// TODO: options: bar color, bar width
+// TODO: options: bar width or scale to bin
 // TODO: add animations to error bars
+// TODO: docs
+// TODO: refactoring
+
+const defaultOptions = {
+  width: '80%'
+};
 
 const ErrorBarsPlugin = {
   id: 'chartJsPluginErrorBars',
 
-  _drawErrorBar(ctx, model, plus, minus, horizontal) {
+  _drawErrorBar(chart, ctx, model, plus, minus, options, horizontal) {
+    const color = options.color ? options.color : model.color;
     ctx.save();
-    ctx.strokeStyle = model.color;
+    ctx.strokeStyle = color;
     ctx.beginPath();
     if (horizontal) {
       ctx.moveTo(model.x + minus, model.y - 5);
@@ -32,30 +39,18 @@ const ErrorBarsPlugin = {
     ctx.restore();
   },
 
-  _isHorizontal(chart) {
-    return chart.config.type === 'horizontalBar';
-  },
-
-  afterDatasetsDraw(chart, easing) {
-    // determine value scale and direction (vert/hor)
-    var horizontal = this._isHorizontal(chart);
-    var vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
-
-    var ctx = chart.ctx;
-    ctx.save();
-
-    var errorBars = chart.data.datasets.map((d) => d.errorBars);
-    var barCoords = [];
+  _getBarchartBaseCoords(chart) {
+    const coords = [];
     chart.data.datasets.forEach((d, i) => {
       var bars = chart.getDatasetMeta(i).data;
-      barCoords.push(bars.map((b, j) => {
+      coords.push(bars.map((b, j) => {
         let barLabel = '';
 
         // line charts do not have labels in their meta data, access global label array instead
         if (!b._model.label) {
           barLabel = chart.data.labels[j];
         } else {
-          barLabel = b._model.label;
+          barLabel = b._model.label;  // required for hierarchical
         }
         return {
           label: barLabel,
@@ -65,23 +60,42 @@ const ErrorBarsPlugin = {
         }
       }));
     });
+    return coords;
+  },
 
-    barCoords.forEach((dataset, i) => {
+  _isHorizontal(chart) {
+    return chart.config.type === 'horizontalBar';
+  },
+
+  afterDraw(chart, easing, options) {
+    options = Object.assign({}, defaultOptions, options);
+
+    // determine value scale and direction (vert/hor)
+    var horizontal = this._isHorizontal(chart);
+    var vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
+
+    var ctx = chart.ctx;
+    ctx.save();
+
+    var errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
+    var barchartCoords = this._getBarchartBaseCoords(chart);
+
+    barchartCoords.forEach((dataset, i) => {
       dataset.forEach((b) => {
-        let hasErrorBar = errorBars[i].hasOwnProperty(b.label);
+        let hasLabelProperty = errorBarCoords[i].hasOwnProperty(b.label);
         let errorBarData = null;
-        if (hasErrorBar) {
-          errorBarData = errorBars[i][b.label];
+        if (hasLabelProperty) {
+          errorBarData = errorBarCoords[i][b.label];
         }
-        // hierarchical has its label attribute nested
-        if (!hasErrorBar && b.label && b.label.label && errorBars[i].hasOwnProperty(b.label.label)) {
-          errorBarData = errorBars[i][b.label.label];
+        // hierarchical has its label property nested
+        if (!hasLabelProperty && b.label && b.label.label && errorBarCoords[i].hasOwnProperty(b.label.label)) {
+          errorBarData = errorBarCoords[i][b.label.label];
         }
 
         if (errorBarData) {
           var plus = vScale.getRightValue(errorBarData.plus);
           var minus = vScale.getRightValue(errorBarData.minus);
-          this._drawErrorBar(ctx, b, plus, minus, horizontal);
+          this._drawErrorBar(chart, ctx, b, plus, minus, options, horizontal);
         }
       });
     });
