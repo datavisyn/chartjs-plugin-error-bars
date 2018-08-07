@@ -13,45 +13,9 @@ const ErrorBarsPlugin = {
   id: 'chartJsPluginErrorBars',
 
   /**
-   * draw error bar mark
-   * @param chart chartjs instance
-   * @param ctx canvas context
-   * @param model bar base coords
-   * @param plus positive error bar length
-   * @param minus negative error bar length
-   * @param color error bar stroke color
-   * @param width error bar width in pixel
-   * @param horizontal orientation
-   * @private
-   */
-  _drawErrorBar(chart, ctx, model, plus, minus, color, width, horizontal) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.beginPath();
-    if (horizontal) {
-      ctx.moveTo(model.x + minus, model.y - width / 2);
-      ctx.lineTo(model.x + minus, model.y + width / 2);
-      ctx.moveTo(model.x + minus, model.y);
-      ctx.lineTo(model.x + plus, model.y);
-      ctx.moveTo(model.x + plus, model.y - width / 2);
-      ctx.lineTo(model.x + plus, model.y + width / 2);
-      ctx.stroke();
-    } else {
-      ctx.moveTo(model.x - width / 2, model.y - plus);
-      ctx.lineTo(model.x + width / 2, model.y - plus);
-      ctx.moveTo(model.x, model.y - plus);
-      ctx.lineTo(model.x, model.y - minus);
-      ctx.moveTo(model.x - width / 2, model.y - minus);
-      ctx.lineTo(model.x + width / 2, model.y - minus);
-      ctx.stroke();
-    }
-    ctx.restore();
-  },
-
-  /**
    * get original barchart base bar coords
    * @param chart chartjs instance
-   * @returns {Array}
+   * @returns {Array} containing label, x, y and color
    * @private
    */
   _getBarchartBaseCoords(chart) {
@@ -91,7 +55,9 @@ const ErrorBarsPlugin = {
   /**
    * compute error bars width in pixel or percent
    * @param chart chartjs instance
+   * @param horizontal orientation
    * @param options plugin options
+   * @returns {*} width in pixel as number
    * @private
    */
   _computeWidth(chart, horizontal, options) {
@@ -128,6 +94,42 @@ const ErrorBarsPlugin = {
       }
     }
     return widthInPx;
+  },
+
+  /**
+   * draw error bar mark
+   * @param chart chartjs instance
+   * @param ctx canvas context
+   * @param model bar base coords
+   * @param plus positive error bar length
+   * @param minus negative error bar length
+   * @param color error bar stroke color
+   * @param width error bar width in pixel
+   * @param horizontal orientation
+   * @private
+   */
+  _drawErrorBar(chart, ctx, model, plus, minus, color, width, horizontal) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    if (horizontal) {
+      ctx.moveTo(model.x + minus, model.y - width / 2);
+      ctx.lineTo(model.x + minus, model.y + width / 2);
+      ctx.moveTo(model.x + minus, model.y);
+      ctx.lineTo(model.x + plus, model.y);
+      ctx.moveTo(model.x + plus, model.y - width / 2);
+      ctx.lineTo(model.x + plus, model.y + width / 2);
+      ctx.stroke();
+    } else {
+      ctx.moveTo(model.x - width / 2, model.y - plus);
+      ctx.lineTo(model.x + width / 2, model.y - plus);
+      ctx.moveTo(model.x, model.y - plus);
+      ctx.lineTo(model.x, model.y - minus);
+      ctx.moveTo(model.x - width / 2, model.y - minus);
+      ctx.lineTo(model.x + width / 2, model.y - minus);
+      ctx.stroke();
+    }
+    ctx.restore();
   },
 
   /**
@@ -172,9 +174,8 @@ const ErrorBarsPlugin = {
         // common scale such as categorical
         if (hasLabelProperty) {
           errorBarData = cur[bar.label];
-        }
-        // hierarchical scale has its label property nested in b.label object as b.label.label
-        if (!hasLabelProperty && bar.label && bar.label.label && cur.hasOwnProperty(bar.label.label)) {
+        } else if (!hasLabelProperty && bar.label && bar.label.label && cur.hasOwnProperty(bar.label.label)) {
+          // hierarchical scale has its label property nested in b.label object as b.label.label
           errorBarData = cur[bar.label.label];
         }
 
@@ -184,7 +185,7 @@ const ErrorBarsPlugin = {
           const plus = vScale.getRightValue(errorBarData.plus);
           const minus = vScale.getRightValue(errorBarData.minus);
           if (chart.__renderedOnce) {
-            this._drawErrorBar(chart, ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
+            this._drawErrorBar(chart, ctx, bar, Math.abs(plus), (Math.abs(minus) * -1), errorBarColor, errorBarWidth, horizontal);
           }
         }
       });
