@@ -44,8 +44,8 @@
         randomScalingFactor()
       ],
       errorBars: {
-        'February': {plus: 3, minus: -2},
-        'June': {plus: 1, minus: -4}
+        'February': {plus: 23, minus: -10},
+        'June': {plus: 33, minus: -25}
       }
     }, {
       label: 'Dataset 2',
@@ -62,8 +62,10 @@
         randomScalingFactor()
       ],
       errorBars: {
-        'July': {plus: 13, minus: -5},
-        'November': {plus: 1, minus: -12}
+        'February': {plus: 15, minus: -34},
+        'March': {plus: 5, minus: -24},
+        'May': {plus: 35, minus: -14},
+        'June': {plus: 45, minus: -4}
       }
     }]
 
@@ -87,7 +89,8 @@
           chartJsPluginBarchartBackground: {
             color: '#eeeeee'
           }, chartJsPluginErrorBars: {
-            color: '#666'
+            //color: '#666'
+            width: '60%'
           }
         }
       },

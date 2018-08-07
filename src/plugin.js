@@ -2,19 +2,13 @@
 
 import Chart from 'chart.js';
 
-// TODO: options: bar width or scale to bin
 // TODO: add animations to error bars
 
 const defaultOptions = {
   /**
-   * number with or without pixel or percent with percentage sign
+   * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
    */
-  width: '80%',
-
-  /**
-   * stroke width in pixel
-   */
-  lineWidth: 1
+  width: 10
 };
 
 const ErrorBarsPlugin = {
@@ -27,31 +21,30 @@ const ErrorBarsPlugin = {
    * @param model bar base coords
    * @param plus positive error bar length
    * @param minus negative error bar length
-   * @param options plugin options
+   * @param color error bar stroke color
+   * @param width error bar width in pixel
    * @param horizontal orientation
    * @private
    */
-  _drawErrorBar(chart, ctx, model, plus, minus, options, horizontal) {
-    const color = options.color ? options.color : model.color;
+  _drawErrorBar(chart, ctx, model, plus, minus, color, width, horizontal) {
     ctx.save();
     ctx.strokeStyle = color;
-    ctx.lineWidth = options.lineWidth;
     ctx.beginPath();
     if (horizontal) {
-      ctx.moveTo(model.x + minus, model.y - 5);
-      ctx.lineTo(model.x + minus, model.y + 5);
+      ctx.moveTo(model.x + minus, model.y - width / 2);
+      ctx.lineTo(model.x + minus, model.y + width / 2);
       ctx.moveTo(model.x + minus, model.y);
       ctx.lineTo(model.x + plus, model.y);
-      ctx.moveTo(model.x + plus, model.y - 5);
-      ctx.lineTo(model.x + plus, model.y + 5);
+      ctx.moveTo(model.x + plus, model.y - width / 2);
+      ctx.lineTo(model.x + plus, model.y + width / 2);
       ctx.stroke();
     } else {
-      ctx.moveTo(model.x - 5, model.y - plus);
-      ctx.lineTo(model.x + 5, model.y - plus);
+      ctx.moveTo(model.x - width / 2, model.y - plus);
+      ctx.lineTo(model.x + width / 2, model.y - plus);
       ctx.moveTo(model.x, model.y - plus);
       ctx.lineTo(model.x, model.y - minus);
-      ctx.moveTo(model.x - 5, model.y - minus);
-      ctx.lineTo(model.x + 5, model.y - minus);
+      ctx.moveTo(model.x - width / 2, model.y - minus);
+      ctx.lineTo(model.x + width / 2, model.y - minus);
       ctx.stroke();
     }
     ctx.restore();
@@ -81,7 +74,7 @@ const ErrorBarsPlugin = {
           x: b._model.x,
           y: b._model.y,
           color: b._model.borderColor
-        }
+        };
       }));
     });
     return coords;
@@ -103,10 +96,41 @@ const ErrorBarsPlugin = {
    * @param options plugin options
    * @private
    */
-  _computeWidth(chart, options) {
-    // TODO:
-    console.log(chart);
-    console.log(options);
+  _computeWidth(chart, horizontal, options) {
+    const width = options.width;
+    let widthInPx = width;
+
+    try {
+
+      if (typeof width === 'string') {
+        if (width.match(/px/)) {
+          widthInPx = parseInt(width.replace(/px/, ''), 10);
+        } else {
+
+          // handle percentage values: convert to positive number between 0 and 100
+          const widthInPercent = Math.min(100, Math.abs(Number(width.replace(/%/, ''))));
+          const model = chart.getDatasetMeta(0).data[0]._model;
+
+          if (chart.config.type === 'line') {
+            widthInPx = parseInt(model.controlPointPreviousX + model.controlPointNextX, 10);
+          } else {
+            if (horizontal) {
+              widthInPx = parseInt(model.height, 10);
+            } else {
+              widthInPx = parseInt(model.width, 10);
+            }
+          }
+          widthInPx = (widthInPercent / 100) * widthInPx;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (Number.isNaN(widthInPx)) {
+        widthInPx = options.width;
+      }
+    }
+    return widthInPx;
   },
 
   /**
@@ -122,32 +146,40 @@ const ErrorBarsPlugin = {
     const horizontal = this._isHorizontal(chart);
     const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
-    const ctx = chart.ctx;
-    ctx.save();
-
+    // error bar and barchart bar coords
     const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
     const barchartCoords = this._getBarchartBaseCoords(chart);
 
+    if (!barchartCoords || !barchartCoords[0] || !barchartCoords[0][0]) {
+      return;
+    }
+
+    const errorBarWidth = this._computeWidth(chart, horizontal, options);
+
+    const ctx = chart.ctx;
+    ctx.save();
+
     // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
-      dataset.forEach((b) => {
-        let hasLabelProperty = errorBarCoords[i].hasOwnProperty(b.label);
+      dataset.forEach((bar) => {
+        let hasLabelProperty = errorBarCoords[i].hasOwnProperty(bar.label);
         let errorBarData = null;
 
         // common scale such as categorical
         if (hasLabelProperty) {
-          errorBarData = errorBarCoords[i][b.label];
+          errorBarData = errorBarCoords[i][bar.label];
         }
         // hierarchical scale has its label property nested in b.label object as b.label.label
-        if (!hasLabelProperty && b.label && b.label.label && errorBarCoords[i].hasOwnProperty(b.label.label)) {
-          errorBarData = errorBarCoords[i][b.label.label];
+        if (!hasLabelProperty && bar.label && bar.label.label && errorBarCoords[i].hasOwnProperty(bar.label.label)) {
+          errorBarData = errorBarCoords[i][bar.label.label];
         }
 
         // error bar data for the barchart bar or point in linechart
         if (errorBarData) {
+          const errorBarColor = options.color ? options.color : bar.color;
           const plus = vScale.getRightValue(errorBarData.plus);
           const minus = vScale.getRightValue(errorBarData.minus);
-          this._drawErrorBar(chart, ctx, b, plus, minus, options, horizontal);
+          this._drawErrorBar(chart, ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
         }
       });
     });
