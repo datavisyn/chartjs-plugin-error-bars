@@ -150,7 +150,7 @@ const ErrorBarsPlugin = {
     const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
     const barchartCoords = this._getBarchartBaseCoords(chart);
 
-    if (!barchartCoords || !barchartCoords[0] || !barchartCoords[0][0]) {
+    if (!barchartCoords || !barchartCoords[0] || !barchartCoords[0][0] || !errorBarCoords) {
       return;
     }
 
@@ -162,16 +162,20 @@ const ErrorBarsPlugin = {
     // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
       dataset.forEach((bar) => {
-        let hasLabelProperty = errorBarCoords[i].hasOwnProperty(bar.label);
+        let cur = errorBarCoords[i];
+        if (!cur) {
+          return;
+        }
+        let hasLabelProperty = cur.hasOwnProperty(bar.label);
         let errorBarData = null;
 
         // common scale such as categorical
         if (hasLabelProperty) {
-          errorBarData = errorBarCoords[i][bar.label];
+          errorBarData = cur[bar.label];
         }
         // hierarchical scale has its label property nested in b.label object as b.label.label
-        if (!hasLabelProperty && bar.label && bar.label.label && errorBarCoords[i].hasOwnProperty(bar.label.label)) {
-          errorBarData = errorBarCoords[i][bar.label.label];
+        if (!hasLabelProperty && bar.label && bar.label.label && cur.hasOwnProperty(bar.label.label)) {
+          errorBarData = cur[bar.label.label];
         }
 
         // error bar data for the barchart bar or point in linechart
