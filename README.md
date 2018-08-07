@@ -1,7 +1,7 @@
 # Chart.js Error Bars Plugin
 [![datavisyn][datavisyn-image]][datavisyn-url] [![NPM Package][npm-image]][npm-url] [![CircleCI][circleci-image]][circleci-url]
 
-[Chart.js](http://www.chartjs.org/) plugin for adding error bars to Line-, Barcharts or hierarchical Barcharts. This plugin also works with the [Hierarchical Scale Plugin](https://github.com/datavisyn/chartjs-plugin-barchart-background).
+[Chart.js](http://www.chartjs.org/) plugin for adding error bars to Line-, Barcharts or hierarchical Barcharts. This plugin also works with the [Hierarchical Scale Plugin](https://github.com/datavisyn/chartjs-scale-hierarchical).
 
 ![selection_037](https://user-images.githubusercontent.com/5220584/43774415-4ab5ae88-9a49-11e8-813d-48d607d45225.png)
 ![selection_038](https://user-images.githubusercontent.com/5220584/43774418-4d08132e-9a49-11e8-9e90-723ef91783c7.png)
