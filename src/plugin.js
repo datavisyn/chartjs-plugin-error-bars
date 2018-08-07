@@ -8,7 +8,8 @@ import Chart from 'chart.js';
 // TODO: refactoring
 
 const defaultOptions = {
-  width: '80%'
+  width: '80%', // number with or without px or in %
+  lineWidth: 1
 };
 
 const ErrorBarsPlugin = {
@@ -18,6 +19,7 @@ const ErrorBarsPlugin = {
     const color = options.color ? options.color : model.color;
     ctx.save();
     ctx.strokeStyle = color;
+    ctx.lineWidth = options.lineWidth;
     ctx.beginPath();
     if (horizontal) {
       ctx.moveTo(model.x + minus, model.y - 5);
@@ -42,11 +44,11 @@ const ErrorBarsPlugin = {
   _getBarchartBaseCoords(chart) {
     const coords = [];
     chart.data.datasets.forEach((d, i) => {
-      var bars = chart.getDatasetMeta(i).data;
+      const bars = chart.getDatasetMeta(i).data;
       coords.push(bars.map((b, j) => {
-        let barLabel = '';
 
         // line charts do not have labels in their meta data, access global label array instead
+        let barLabel = '';
         if (!b._model.label) {
           barLabel = chart.data.labels[j];
         } else {
@@ -67,18 +69,23 @@ const ErrorBarsPlugin = {
     return chart.config.type === 'horizontalBar';
   },
 
+  _computeWidth(chart, options) {
+    console.log(chart);
+    console.log(options);
+  },
+
   afterDraw(chart, easing, options) {
     options = Object.assign({}, defaultOptions, options);
 
     // determine value scale and direction (vert/hor)
-    var horizontal = this._isHorizontal(chart);
-    var vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
+    const horizontal = this._isHorizontal(chart);
+    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
-    var ctx = chart.ctx;
+    const ctx = chart.ctx;
     ctx.save();
 
-    var errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
-    var barchartCoords = this._getBarchartBaseCoords(chart);
+    const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
+    const barchartCoords = this._getBarchartBaseCoords(chart);
 
     barchartCoords.forEach((dataset, i) => {
       dataset.forEach((b) => {
@@ -93,8 +100,8 @@ const ErrorBarsPlugin = {
         }
 
         if (errorBarData) {
-          var plus = vScale.getRightValue(errorBarData.plus);
-          var minus = vScale.getRightValue(errorBarData.minus);
+          const plus = vScale.getRightValue(errorBarData.plus);
+          const minus = vScale.getRightValue(errorBarData.minus);
           this._drawErrorBar(chart, ctx, b, plus, minus, options, horizontal);
         }
       });
