@@ -2,8 +2,6 @@
 
 import Chart from 'chart.js';
 
-// TODO: add animations to error bars
-
 const defaultOptions = {
   /**
    * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
