@@ -113,13 +113,12 @@ const ErrorBarsPlugin = {
 
           if (chart.config.type === 'line') {
             widthInPx = parseInt(model.controlPointPreviousX + model.controlPointNextX, 10);
-          } else {
-            if (horizontal) {
-              widthInPx = parseInt(model.height, 10);
-            } else {
-              widthInPx = parseInt(model.width, 10);
-            }
+          } else if (horizontal) {
+            widthInPx = parseInt(model.height, 10);
+          } else if (!horizontal) {
+            widthInPx = parseInt(model.width, 10);
           }
+
           widthInPx = (widthInPercent / 100) * widthInPx;
         }
       }
@@ -136,15 +135,14 @@ const ErrorBarsPlugin = {
   /**
    * plugin hook to draw the error bars
    * @param chart chartjs instance
-   * @param easing animation function
+   * @param easingValue animation function
    * @param options plugin options
    */
-  afterDraw(chart, easing, options) {
+  afterDraw(chart, easingValue, options) {
     options = Object.assign({}, defaultOptions, options);
 
-    // determine value scale and orientation (vertical or horizontal)
-    const horizontal = this._isHorizontal(chart);
-    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
+    // wait for easing value to reach 1 at the first render, after that draw immediately
+    chart.__renderedOnce = chart.__renderedOnce || easingValue === 1;
 
     // error bar and barchart bar coords
     const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
@@ -153,6 +151,10 @@ const ErrorBarsPlugin = {
     if (!barchartCoords || !barchartCoords[0] || !barchartCoords[0][0] || !errorBarCoords) {
       return;
     }
+
+    // determine value scale and orientation (vertical or horizontal)
+    const horizontal = this._isHorizontal(chart);
+    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
     const errorBarWidth = this._computeWidth(chart, horizontal, options);
 
@@ -183,7 +185,9 @@ const ErrorBarsPlugin = {
           const errorBarColor = options.color ? options.color : bar.color;
           const plus = vScale.getRightValue(errorBarData.plus);
           const minus = vScale.getRightValue(errorBarData.minus);
-          this._drawErrorBar(chart, ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
+          if (chart.__renderedOnce) {
+            this._drawErrorBar(chart, ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
+          }
         }
       });
     });
