@@ -4,17 +4,33 @@ import Chart from 'chart.js';
 
 // TODO: options: bar width or scale to bin
 // TODO: add animations to error bars
-// TODO: docs
-// TODO: refactoring
 
 const defaultOptions = {
-  width: '80%', // number with or without px or in %
+  /**
+   * number with or without pixel or percent with percentage sign
+   */
+  width: '80%',
+
+  /**
+   * stroke width in pixel
+   */
   lineWidth: 1
 };
 
 const ErrorBarsPlugin = {
   id: 'chartJsPluginErrorBars',
 
+  /**
+   * draw error bar mark
+   * @param chart chartjs instance
+   * @param ctx canvas context
+   * @param model bar base coords
+   * @param plus positive error bar length
+   * @param minus negative error bar length
+   * @param options plugin options
+   * @param horizontal orientation
+   * @private
+   */
   _drawErrorBar(chart, ctx, model, plus, minus, options, horizontal) {
     const color = options.color ? options.color : model.color;
     ctx.save();
@@ -41,6 +57,12 @@ const ErrorBarsPlugin = {
     ctx.restore();
   },
 
+  /**
+   * get original barchart base bar coords
+   * @param chart chartjs instance
+   * @returns {Array}
+   * @private
+   */
   _getBarchartBaseCoords(chart) {
     const coords = [];
     chart.data.datasets.forEach((d, i) => {
@@ -65,19 +87,38 @@ const ErrorBarsPlugin = {
     return coords;
   },
 
+  /**
+   * check whether the chart orientation is horizontal
+   * @param chart chartjs instance
+   * @returns {boolean}
+   * @private
+   */
   _isHorizontal(chart) {
     return chart.config.type === 'horizontalBar';
   },
 
+  /**
+   * compute error bars width in pixel or percent
+   * @param chart chartjs instance
+   * @param options plugin options
+   * @private
+   */
   _computeWidth(chart, options) {
+    // TODO:
     console.log(chart);
     console.log(options);
   },
 
+  /**
+   * plugin hook to draw the error bars
+   * @param chart chartjs instance
+   * @param easing animation function
+   * @param options plugin options
+   */
   afterDraw(chart, easing, options) {
     options = Object.assign({}, defaultOptions, options);
 
-    // determine value scale and direction (vert/hor)
+    // determine value scale and orientation (vertical or horizontal)
     const horizontal = this._isHorizontal(chart);
     const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
@@ -87,18 +128,22 @@ const ErrorBarsPlugin = {
     const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
     const barchartCoords = this._getBarchartBaseCoords(chart);
 
+    // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
       dataset.forEach((b) => {
         let hasLabelProperty = errorBarCoords[i].hasOwnProperty(b.label);
         let errorBarData = null;
+
+        // common scale such as categorical
         if (hasLabelProperty) {
           errorBarData = errorBarCoords[i][b.label];
         }
-        // hierarchical has its label property nested
+        // hierarchical scale has its label property nested in b.label object as b.label.label
         if (!hasLabelProperty && b.label && b.label.label && errorBarCoords[i].hasOwnProperty(b.label.label)) {
           errorBarData = errorBarCoords[i][b.label.label];
         }
 
+        // error bar data for the barchart bar or point in linechart
         if (errorBarData) {
           const plus = vScale.getRightValue(errorBarData.plus);
           const minus = vScale.getRightValue(errorBarData.minus);
