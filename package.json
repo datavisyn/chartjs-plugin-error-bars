@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-error-bars",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Error Bars Chart.js Plugin",
   "main": "build/Plugin.Errorbars.js",
   "repository": {
