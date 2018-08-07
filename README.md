@@ -3,6 +3,8 @@
 
 [Chart.js](http://www.chartjs.org/) plugin for adding error bars to Line-, Barcharts or hierarchical Barcharts. This plugin also works with the [Hierarchical Scale Plugin](https://github.com/datavisyn/chartjs-scale-hierarchical).
 
+Try the demo on [Codepen](https://codepen.io/sluger/pen/YjJKYy).
+
 ![selection_037](https://user-images.githubusercontent.com/5220584/43774415-4ab5ae88-9a49-11e8-813d-48d607d45225.png)
 ![selection_038](https://user-images.githubusercontent.com/5220584/43774418-4d08132e-9a49-11e8-9e90-723ef91783c7.png)
 ![selection_039](https://user-images.githubusercontent.com/5220584/43774420-4e7d7546-9a49-11e8-8cc9-67c63de96081.png)
@@ -64,7 +66,7 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
          * @default: derived from borderColor
          */
         color: '#666'
-        
+
         /**
         * bar width in pixel as number or string or bar width in percent based on the barchart bars width (max 100%)
         * @default 10
