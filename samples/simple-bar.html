@@ -29,13 +29,13 @@
       borderColor: '#d95f02',
       borderWidth: 1,
       data: [
-        56,
+        60,
         33,
         78,
         54
       ],
       errorBars: {
-        'January': {plus: 15, minus: -34},
+        'January': {plus: 10, minus: -10},
         'February': {plus: 15, minus: -3},
         'March': {plus: 35, minus: -14},
         'April': {plus: 45, minus: -4}
@@ -68,6 +68,13 @@
       data: barChartData,
       options: {
         responsive: true,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
         legend: {
           position: 'top',
         },
