@@ -65,13 +65,19 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
          * stroke color
          * @default: derived from borderColor
          */
-        color: '#666'
+        color: '#666',
 
         /**
-        * bar width in pixel as number or string or bar width in percent based on the barchart bars width (max 100%)
-        * @default 10
-        */
-        width: 10 | '10px' | '60%'
+         * bar width in pixel as number or string or bar width in percent based on the barchart bars width (max 100%)
+         * @default 10
+         */
+        width: 10 | '10px' | '60%',
+
+        /**
+         * whether to interpet the plus/minus values, relative to the value itself (default) or absolute
+         * @default false
+         */
+        absoluteValues: false
       }
     }
 

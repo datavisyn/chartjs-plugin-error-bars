@@ -4,9 +4,19 @@ import Chart from 'chart.js';
 
 const defaultOptions = {
   /**
+   * stroke color
+   * @default: derived from borderColor
+   */
+  color: undefined,
+  /**
    * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
    */
-  width: 10
+  width: 10,
+
+  /**
+   * whether the error values are given in absolute values or relative (default)
+   */
+  absoluteValues: false
 };
 
 const ErrorBarsPlugin = {
@@ -22,6 +32,7 @@ const ErrorBarsPlugin = {
     const coords = [];
     chart.data.datasets.forEach((d, i) => {
       const bars = chart.getDatasetMeta(i).data;
+      const values = d.data;
       coords.push(bars.map((b, j) => {
 
         // line charts do not have labels in their meta data, access global label array instead
@@ -33,6 +44,7 @@ const ErrorBarsPlugin = {
         }
         return {
           label: barLabel,
+          value: values[j],
           x: b._model.x,
           y: b._model.y,
           color: b._model.borderColor
@@ -98,37 +110,35 @@ const ErrorBarsPlugin = {
 
   /**
    * draw error bar mark
-   * @param chart chartjs instance
    * @param ctx canvas context
    * @param model bar base coords
-   * @param plus positive error bar length
-   * @param minus negative error bar length
+   * @param plus positive error bar position
+   * @param minus negative error bar position
    * @param color error bar stroke color
    * @param width error bar width in pixel
    * @param horizontal orientation
    * @private
    */
-  _drawErrorBar(chart, ctx, model, plus, minus, color, width, horizontal) {
+  _drawErrorBar(ctx, model, plus, minus, color, width, horizontal) {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.beginPath();
     if (horizontal) {
-      ctx.moveTo(model.x + minus, model.y - width / 2);
-      ctx.lineTo(model.x + minus, model.y + width / 2);
-      ctx.moveTo(model.x + minus, model.y);
-      ctx.lineTo(model.x + plus, model.y);
-      ctx.moveTo(model.x + plus, model.y - width / 2);
-      ctx.lineTo(model.x + plus, model.y + width / 2);
-      ctx.stroke();
+      ctx.moveTo(minus, model.y - width / 2);
+      ctx.lineTo(minus, model.y + width / 2);
+      ctx.moveTo(minus, model.y);
+      ctx.lineTo(plus, model.y);
+      ctx.moveTo(plus, model.y - width / 2);
+      ctx.lineTo(plus, model.y + width / 2);
     } else {
-      ctx.moveTo(model.x - width / 2, model.y - plus);
-      ctx.lineTo(model.x + width / 2, model.y - plus);
-      ctx.moveTo(model.x, model.y - plus);
-      ctx.lineTo(model.x, model.y - minus);
-      ctx.moveTo(model.x - width / 2, model.y - minus);
-      ctx.lineTo(model.x + width / 2, model.y - minus);
-      ctx.stroke();
+      ctx.moveTo(model.x - width / 2, plus);
+      ctx.lineTo(model.x + width / 2, plus);
+      ctx.moveTo(model.x, plus);
+      ctx.lineTo(model.x, minus);
+      ctx.moveTo(model.x - width / 2, minus);
+      ctx.lineTo(model.x + width / 2, minus);
     }
+    ctx.stroke();
     ctx.restore();
   },
 
@@ -139,10 +149,14 @@ const ErrorBarsPlugin = {
    * @param options plugin options
    */
   afterDraw(chart, easingValue, options) {
-    options = Object.assign({}, defaultOptions, options);
-
     // wait for easing value to reach 1 at the first render, after that draw immediately
     chart.__renderedOnce = chart.__renderedOnce || easingValue === 1;
+
+    if (!chart.__renderedOnce) {
+      return;
+    }
+
+    options = Object.assign({}, defaultOptions, options);
 
     // error bar and barchart bar coords
     const errorBarCoords = chart.data.datasets.map((d) => d.errorBars);
@@ -182,11 +196,15 @@ const ErrorBarsPlugin = {
         // error bar data for the barchart bar or point in linechart
         if (errorBarData) {
           const errorBarColor = options.color ? options.color : bar.color;
-          const plus = vScale.getRightValue(errorBarData.plus);
-          const minus = vScale.getRightValue(errorBarData.minus);
-          if (chart.__renderedOnce) {
-            this._drawErrorBar(chart, ctx, bar, Math.abs(plus), (Math.abs(minus) * -1), errorBarColor, errorBarWidth, horizontal);
-          }
+          const value = vScale.getRightValue(bar.value);
+
+          const plusValue = options.absoluteValues ? Math.abs(errorBarData.plus) : (value + Math.abs(errorBarData.plus));
+          const minusValue = options.absoluteValues ? Math.abs(errorBarData.minus) : (value - Math.abs(errorBarData.minus));
+
+          const plus = vScale.getPixelForValue(plusValue);
+          const minus = vScale.getPixelForValue(minusValue);
+
+          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
         }
       });
     });
