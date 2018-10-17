@@ -8,10 +8,16 @@ const defaultOptions = {
    * @default: derived from borderColor
    */
   color: undefined,
+
   /**
-   * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
+   * width as number, or as string with pixel (px) ending, or as string with percentage (%) ending
    */
   width: 10,
+
+  /**
+   * lineWidth as number, or as string with pixel (px) ending
+   */
+  lineWidth: 2,
 
   /**
    * whether the error values are given in absolute values or relative (default)
@@ -116,11 +122,13 @@ const ErrorBarsPlugin = {
    * @param minus negative error bar position
    * @param color error bar stroke color
    * @param width error bar width in pixel
+   * @param lineWidth error ber line width
    * @param horizontal orientation
    * @private
    */
-  _drawErrorBar(ctx, model, plus, minus, color, width, horizontal) {
+  _drawErrorBar(ctx, model, plus, minus, color, width, lineWidth, horizontal) {
     ctx.save();
+    ctx.lineWidth=lineWidth;
     ctx.strokeStyle = color;
     ctx.beginPath();
     if (horizontal) {
@@ -204,7 +212,7 @@ const ErrorBarsPlugin = {
           const plus = vScale.getPixelForValue(plusValue);
           const minus = vScale.getPixelForValue(minusValue);
 
-          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
+          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarWidth, options.lineWidth, horizontal);
         }
       });
     });
