@@ -128,7 +128,7 @@ const ErrorBarsPlugin = {
    */
   _drawErrorBar(ctx, model, plus, minus, color, width, lineWidth, horizontal) {
     ctx.save();
-    ctx.lineWidth=lineWidth;
+    ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color;
     ctx.beginPath();
     if (horizontal) {
