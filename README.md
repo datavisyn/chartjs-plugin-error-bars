@@ -72,6 +72,11 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
          * @default 10
          */
         width: 10 | '10px' | '60%',
+        
+        /**
+         * lineWidth as number, or as string with pixel (px) ending
+         */
+        lineWidth: 2 | '2px',
 
         /**
          * whether to interpet the plus/minus values, relative to the value itself (default) or absolute
