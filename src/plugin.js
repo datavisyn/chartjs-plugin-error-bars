@@ -206,8 +206,8 @@ const ErrorBarsPlugin = {
           const errorBarColor = options.color ? options.color : bar.color;
           const value = vScale.getRightValue(bar.value);
 
-          const plusValue = options.absoluteValues ? Math.abs(errorBarData.plus) : (value + Math.abs(errorBarData.plus));
-          const minusValue = options.absoluteValues ? Math.abs(errorBarData.minus) : (value - Math.abs(errorBarData.minus));
+          const plusValue = options.absoluteValues ? errorBarData.plus : (value + Math.abs(errorBarData.plus));
+          const minusValue = options.absoluteValues ? errorBarData.minus : (value - Math.abs(errorBarData.minus));
 
           const plus = vScale.getPixelForValue(plusValue);
           const minus = vScale.getPixelForValue(minusValue);
