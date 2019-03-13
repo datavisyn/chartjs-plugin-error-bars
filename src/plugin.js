@@ -8,10 +8,16 @@ const defaultOptions = {
    * @default: derived from borderColor
    */
   color: undefined,
+
   /**
    * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
    */
   width: 10,
+
+  /**
+   * lineWidth as number, or as string with pixel (px) ending, or array of such definition
+   */
+  lineWidth: 2,
 
   /**
    * whether the error values are given in absolute values or relative (default)
@@ -118,9 +124,10 @@ const ErrorBarsPlugin = {
    * @param horizontal orientation
    * @private
    */
-  _drawErrorBar(ctx, model, plus, minus, color, width, horizontal) {
+  _drawErrorBar(ctx, model, plus, minus, color, lineWidth, width, horizontal) {
     ctx.save();
     ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     if (horizontal) {
       ctx.moveTo(minus, model.y - width / 2);
@@ -170,6 +177,7 @@ const ErrorBarsPlugin = {
     const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
     const errorBarWidths = (Array.isArray(options.width) ? options.width : [options.width]).map((w) => this._computeWidth(chart, horizontal, w));
+    const errorBarLineWidths = Array.isArray(options.lineWidth) ? options.lineWidth : [options.lineWidth];
     const errorBarColors = Array.isArray(options.color) ? options.color : [options.color];
 
 
@@ -204,6 +212,7 @@ const ErrorBarsPlugin = {
         errorBars.forEach((errorBar, ei) => {
           // error bar data for the barchart bar or point in linechart
           const errorBarColor = errorBarColors[ei % errorBarColors.length] ? errorBarColors[ei % errorBarColors.length] : bar.color;
+          const errorBarLineWidth = errorBarLineWidths[ei % errorBarLineWidths.length];
           const errorBarWidth = errorBarWidths[ei % errorBarWidths.length];
 
           const plusValue = options.absoluteValues ? errorBar.plus : (value + errorBar.plus);
@@ -212,7 +221,7 @@ const ErrorBarsPlugin = {
           const plus = vScale.getPixelForValue(plusValue);
           const minus = vScale.getPixelForValue(minusValue);
 
-          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
+          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarLineWidth, errorBarWidth, horizontal);
         });
       });
     });

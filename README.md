@@ -99,6 +99,7 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
 
         /**
          * lineWidth as number, or as string with pixel (px) ending, or array of such definition
+         * @default 2
          */
         lineWidth: 2 | '2px',
 
