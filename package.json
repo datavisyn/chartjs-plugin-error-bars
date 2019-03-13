@@ -28,9 +28,8 @@
     "chart.js": "^2.7.3"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "eslint": "^5.15.1",
     "package-preamble": "0.1",
     "rimraf": "^2.6.3",
