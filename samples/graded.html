@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Vertical Bar</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js" type></script>
+  <script src="../build/Plugin.Errorbars.js"></script>
+  <style>
+    canvas {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+<div id="container" style="width: 75%;">
+  <canvas id="canvas"></canvas>
+</div>
+<script>
+  var color = Chart.helpers.color;
+  var barChartData = {
+    labels: ['Value', 'Value 2', 'Value 3', 'Value 4'],
+    datasets: [{
+      label: 'Dataset 1',
+      //backgroundColor: '#d95f02',
+      borderColor: '#d95f02',
+      borderWidth: 1,
+      data: [
+        50,
+        -5,
+        130,
+        -40
+      ],
+      errorBars: {
+        'Value': [{minus: 20, plus: 80}, {minus: 40, plus: 60}],
+        'Value 2': [{minus: -30, plus: 120}, {minus: -20, plus: 50}]
+      }
+    }]
+
+  };
+
+  window.onload = function () {
+    var ctx = document.getElementById("canvas").getContext("2d");
+    window.myBar = new Chart(ctx, {
+      type: 'bar',
+      data: barChartData,
+      options: {
+        responsive: true,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Chart.js Error Bars Plugin'
+        },
+        plugins: {
+          chartJsPluginErrorBars: {
+            width: '20%',
+            lineWidth: [2, 4],
+            color: ['#bcbddc', '#756bb1'],
+            absoluteValues: true
+            //color: 'darkgray'
+          }
+        }
+      },
+    });
+  };
+</script>
+</body>
+
+</html>

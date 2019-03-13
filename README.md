@@ -14,6 +14,7 @@ Try the demo on [Codepen](https://codepen.io/sluger/pen/YjJKYy).
 npm install --save chart.js chartjs-plugin-error-bars
 ```
 
+
 ## Usage
 Datasets must define an `errorBars` object that contains the error bar property key (same as in the used scale) and values `plus` and `minus`. Plus values are always positive, and minus vice versa.
 
@@ -29,6 +30,29 @@ Datasets must define an `errorBars` object that contains the error bar property 
         'May': {plus: 35, minus: -14},
         'June': {plus: 45, minus: -4}
       }, ...
+
+      /* or for graded error bars
+
+      errorBars: {
+        'February': [{plus: 15, minus: -34}, {plus: 10, minus: -26}],
+        'March': [{plus: 5, minus: -24}, {plus: 2, minus: -16}],
+        'May': [{plus: 35, minus: -14}, {plus: 7, minus: -7}],
+        'June': [{plus: 45, minus: -4}, {plus: 25, minus: -2}]
+      }, ...
+
+      */
+```
+
+corresponding TypeScript interface
+```ts
+interface IErrorBars {
+  [label: string]: IErrorBar | IErrorBar[];
+}
+
+interface IErrorBar {
+  plus: number;
+  minus: number;
+}
 ```
 
 *Hierarchical scale plugin usage:*
@@ -62,16 +86,21 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
     plugins: {
       chartJsPluginErrorBars: {
         /**
-         * stroke color
+         * stroke color, or array of colors
          * @default: derived from borderColor
          */
         color: '#666',
 
         /**
-         * bar width in pixel as number or string or bar width in percent based on the barchart bars width (max 100%)
+         * bar width in pixel as number or string or bar width in percent based on the barchart bars width (max 100%), or array of such definition
          * @default 10
          */
         width: 10 | '10px' | '60%',
+
+        /**
+         * lineWidth as number, or as string with pixel (px) ending, or array of such definition
+         */
+        lineWidth: 2 | '2px',
 
         /**
          * whether to interpet the plus/minus values, relative to the value itself (default) or absolute
@@ -82,6 +111,16 @@ Find more [Samples](https://github.com/datavisyn/chartjs-plugin-error-bars/tree/
     }
 
   ...
+}
+```
+
+corresponding TypeScript interface
+```ts
+interface IChartJsPluginErrorBarsOptions {
+  color: string | string[];
+  width: (string | number) | (string | number)[];
+  lineWidth: (string | number) | (string | number)[];
+  absoluteValues: boolean;
 }
 ```
 
