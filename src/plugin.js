@@ -40,7 +40,7 @@ const ErrorBarsPlugin = {
         if (!b._model.label) {
           barLabel = chart.data.labels[j];
         } else {
-          barLabel = b._model.label;  // required for hierarchical
+          barLabel = b._model.label; // required for hierarchical
         }
         return {
           label: barLabel,
