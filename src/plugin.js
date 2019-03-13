@@ -215,7 +215,7 @@ const ErrorBarsPlugin = {
           const errorBarLineWidth = errorBarLineWidths[ei % errorBarLineWidths.length];
           const errorBarWidth = errorBarWidths[ei % errorBarWidths.length];
 
-          const plusValue = options.absoluteValues ? errorBar.plus : (value + errorBar.plus);
+          const plusValue = options.absoluteValues ? errorBar.plus : (value + Math.abs(errorBar.plus));
           const minusValue = options.absoluteValues ? errorBar.minus : (value - Math.abs(errorBar.minus));
 
           const plus = vScale.getPixelForValue(plusValue);
