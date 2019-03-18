@@ -8,10 +8,16 @@ const defaultOptions = {
    * @default: derived from borderColor
    */
   color: undefined,
+
   /**
    * with as number, or as string with pixel (px) ending, or as string with percentage (%) ending
    */
   width: 10,
+
+  /**
+   * lineWidth as number, or as string with pixel (px) ending, or array of such definition
+   */
+  lineWidth: 2,
 
   /**
    * whether the error values are given in absolute values or relative (default)
@@ -68,12 +74,11 @@ const ErrorBarsPlugin = {
    * compute error bars width in pixel or percent
    * @param chart chartjs instance
    * @param horizontal orientation
-   * @param options plugin options
+   * @param width plugin option width
    * @returns {*} width in pixel as number
    * @private
    */
-  _computeWidth(chart, horizontal, options) {
-    const width = options.width;
+  _computeWidth(chart, horizontal, width) {
     let widthInPx = width;
 
     try {
@@ -102,7 +107,7 @@ const ErrorBarsPlugin = {
       console.error(e);
     } finally {
       if (Number.isNaN(widthInPx)) {
-        widthInPx = options.width;
+        widthInPx = width;
       }
     }
     return widthInPx;
@@ -119,9 +124,10 @@ const ErrorBarsPlugin = {
    * @param horizontal orientation
    * @private
    */
-  _drawErrorBar(ctx, model, plus, minus, color, width, horizontal) {
+  _drawErrorBar(ctx, model, plus, minus, color, lineWidth, width, horizontal) {
     ctx.save();
     ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     if (horizontal) {
       ctx.moveTo(minus, model.y - width / 2);
@@ -170,7 +176,10 @@ const ErrorBarsPlugin = {
     const horizontal = this._isHorizontal(chart);
     const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
-    const errorBarWidth = this._computeWidth(chart, horizontal, options);
+    const errorBarWidths = (Array.isArray(options.width) ? options.width : [options.width]).map((w) => this._computeWidth(chart, horizontal, w));
+    const errorBarLineWidths = Array.isArray(options.lineWidth) ? options.lineWidth : [options.lineWidth];
+    const errorBarColors = Array.isArray(options.color) ? options.color : [options.color];
+
 
     const ctx = chart.ctx;
     ctx.save();
@@ -182,7 +191,7 @@ const ErrorBarsPlugin = {
         if (!cur) {
           return;
         }
-        let hasLabelProperty = cur.hasOwnProperty(bar.label);
+        const hasLabelProperty = cur.hasOwnProperty(bar.label);
         let errorBarData = null;
 
         // common scale such as categorical
@@ -193,19 +202,27 @@ const ErrorBarsPlugin = {
           errorBarData = cur[bar.label.label];
         }
 
-        // error bar data for the barchart bar or point in linechart
-        if (errorBarData) {
-          const errorBarColor = options.color ? options.color : bar.color;
-          const value = vScale.getRightValue(bar.value);
+        if (!errorBarData) {
+          return;
+        }
 
-          const plusValue = options.absoluteValues ? Math.abs(errorBarData.plus) : (value + Math.abs(errorBarData.plus));
-          const minusValue = options.absoluteValues ? Math.abs(errorBarData.minus) : (value - Math.abs(errorBarData.minus));
+        const errorBars = Array.isArray(errorBarData) ? errorBarData : [errorBarData];
+        const value = vScale.getRightValue(bar.value);
+
+        errorBars.forEach((errorBar, ei) => {
+          // error bar data for the barchart bar or point in linechart
+          const errorBarColor = errorBarColors[ei % errorBarColors.length] ? errorBarColors[ei % errorBarColors.length] : bar.color;
+          const errorBarLineWidth = errorBarLineWidths[ei % errorBarLineWidths.length];
+          const errorBarWidth = errorBarWidths[ei % errorBarWidths.length];
+
+          const plusValue = options.absoluteValues ? errorBar.plus : (value + Math.abs(errorBar.plus));
+          const minusValue = options.absoluteValues ? errorBar.minus : (value - Math.abs(errorBar.minus));
 
           const plus = vScale.getPixelForValue(plusValue);
           const minus = vScale.getPixelForValue(minusValue);
 
-          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarWidth, horizontal);
-        }
+          this._drawErrorBar(ctx, bar, plus, minus, errorBarColor, errorBarLineWidth, errorBarWidth, horizontal);
+        });
       });
     });
 
