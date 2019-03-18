@@ -15,11 +15,7 @@ const defaultOptions = {
   width: 10,
 
   /**
-<<<<<<< HEAD
-   * lineWidth as number, or as string with pixel (px) ending
-=======
    * lineWidth as number, or as string with pixel (px) ending, or array of such definition
->>>>>>> develop
    */
   lineWidth: 2,
 
@@ -129,11 +125,7 @@ const ErrorBarsPlugin = {
    * @param horizontal orientation
    * @private
    */
-<<<<<<< HEAD
-  _drawErrorBar(ctx, model, plus, minus, color, width, lineWidth, horizontal) {
-=======
   _drawErrorBar(ctx, model, plus, minus, color, lineWidth, width, horizontal) {
->>>>>>> develop
     ctx.save();
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color;
