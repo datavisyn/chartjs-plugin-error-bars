@@ -156,7 +156,7 @@ const ErrorBarsPlugin = {
    * @param easingValue animation function
    * @param options plugin options
    */
-  afterDraw(chart, easingValue, options) {
+  afterDatasetsDraw(chart, easingValue, options) {
     // wait for easing value to reach 1 at the first render, after that draw immediately
     chart.__renderedOnce = chart.__renderedOnce || easingValue === 1;
 
