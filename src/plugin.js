@@ -151,6 +151,19 @@ const ErrorBarsPlugin = {
   },
 
   /**
+   * resolve scale for current dataset from config and fallback to default scale
+   * @param chart chartjs instance
+   * @param horizontal orientation
+   * @param i dataset index
+   */
+  _resolveScale(chart, horizontal, i) {
+    const xAxisId = chart.data.datasets[i].xAxisID || 'x-axis-0';
+    const yAxisId = chart.data.datasets[i].yAxisID || 'y-axis-0';
+    const scaleId = horizontal ? xAxisId : yAxisId;
+    return chart.scales[scaleId];
+  },
+
+  /**
    * plugin hook to draw the error bars
    * @param chart chartjs instance
    * @param easingValue animation function
@@ -176,7 +189,6 @@ const ErrorBarsPlugin = {
 
     // determine value scale and orientation (vertical or horizontal)
     const horizontal = this._isHorizontal(chart);
-    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
     const errorBarWidths = (Array.isArray(options.width) ? options.width : [options.width]).map((w) => this._computeWidth(chart, horizontal, w));
     const errorBarLineWidths = Array.isArray(options.lineWidth) ? options.lineWidth : [options.lineWidth];
@@ -188,6 +200,7 @@ const ErrorBarsPlugin = {
 
     // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
+      const vScale = this._resolveScale(chart, horizontal, i);
       dataset.forEach((bar) => {
         let cur = errorBarCoords[i];
         if (!cur) {
