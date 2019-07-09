@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Chart.js Error Bars Plugin</title>
+  <script src="../node_modules/chart.js/dist/Chart.bundle.js" type></script>
+  <script src="../build/Plugin.Errorbars.js"></script>
+  <style>
+    canvas {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container" style="width: 50%;">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script>
+    var color = Chart.helpers.color;
+    var barChartData = {
+      labels: ["January", "February", "March", "April"],
+      datasets: [
+        {
+          label: "Dataset 1",
+          //backgroundColor: '#d95f02',
+          borderColor: "#d95f02",
+          borderWidth: 1,
+          data: [56, 33, 78, 54],
+          errorBars: {
+            January: {plus: 15, minus: -34},
+            February: {plus: 15, minus: -3},
+            March: {plus: 35, minus: -14},
+            April: {plus: 45, minus: -4}
+          },
+          yAxisID: "y-axis-1"
+        },
+        {
+          label: "Dataset 2",
+          //backgroundColor: '#1b9e77',
+          borderColor: "#1b9e77",
+          borderWidth: 1,
+          data: [100, 77, 33, 45],
+          errorBars: {
+            January: {plus: 15, minus: -34},
+            February: {plus: 5, minus: -24},
+            March: {plus: 20, minus: -4},
+            April: {plus: 45, minus: -20}
+          },
+          yAxisID: "y-axis-2"
+        }
+      ]
+    };
+
+    window.onload = function () {
+      var ctx = document.getElementById("canvas").getContext("2d");
+      window.myBar = new Chart(ctx, {
+        type: "bar",
+        data: barChartData,
+        options: {
+          responsive: true,
+          legend: {
+            position: "top"
+          },
+          title: {
+            display: true,
+            text: "Chart.js Error Bars Plugin"
+          },
+          scales: {
+            yAxes: [
+              {
+                type: "linear",
+                display: true,
+                position: "left",
+                id: "y-axis-1"
+              },
+              {
+                type: "linear",
+                display: true,
+                position: "right",
+                id: "y-axis-2",
+                gridLines: {
+                  drawOnChartArea: false
+                }
+              }
+            ]
+          },
+          plugins: {
+            chartJsPluginErrorBars: {
+              width: "60%"
+              //color: 'darkgray'
+            }
+          }
+        }
+      });
+    };
+  </script>
+</body>
+
+</html>
