@@ -189,6 +189,11 @@ const ErrorBarsPlugin = {
     // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
       dataset.forEach((bar) => {
+        var hidden = chart.data.datasets[i]._meta[0].hidden
+        if (hidden) { 
+          return; 
+        }
+
         let cur = errorBarCoords[i];
         if (!cur) {
           return;
