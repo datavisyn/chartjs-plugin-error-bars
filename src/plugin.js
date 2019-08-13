@@ -26,7 +26,7 @@ const defaultOptions = {
 };
 
 const ErrorBarsPlugin = {
-  id: 'chartJsPluginErrorBars',
+  id: 'error-bars',
 
   /**
    * get original barchart base bar coords
