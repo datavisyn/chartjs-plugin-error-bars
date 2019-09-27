@@ -176,7 +176,7 @@ const ErrorBarsPlugin = {
 
     // determine value scale and orientation (vertical or horizontal)
     const horizontal = this._isHorizontal(chart);
-    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
+    const vScale = chart.scales[options.scale || (horizontal ? 'x-axis-0' : 'y-axis-0')];
 
     const errorBarWidths = (Array.isArray(options.width) ? options.width : [options.width]).map((w) => this._computeWidth(chart, horizontal, w));
     const errorBarLineWidths = Array.isArray(options.lineWidth) ? options.lineWidth : [options.lineWidth];
