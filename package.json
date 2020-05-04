@@ -16,12 +16,16 @@
     "error-bars",
     "javascript"
   ],
-  "author": "stefan.luger@datavisyn.io",
-  "license": "MIT",
+  "author": {
+    "name": "datavisyn GmbH",
+    "email": "contact@datavisyn.io",
+    "url": "https://datavisyn.io"
+  },
+  "license": "BSD-3-Clause",
+  "homepage": "https://datavisyn.io",
   "bugs": {
     "url": "https://github.com/datavisyn/chartjs-plugin-error-bars/issues"
-  },
-  "homepage": "https://github.com/datavisyn/chartjs-plugin-error-bars#readme",
+  }, 
   "files": [
     "build",
     "src/**/*.js"
