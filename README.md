@@ -1,5 +1,5 @@
 # Chart.js Error Bars Plugin
-[![datavisyn][datavisyn-image]][datavisyn-url] [![NPM Package][npm-image]][npm-url] [![CircleCI][circleci-image]][circleci-url]
+[![Target Discovery Platform][tdp-image]][tdp-url] [![NPM Package][npm-image]][npm-url] [![CircleCI][circleci-image]][circleci-url]
 
 [Chart.js](http://www.chartjs.org/) plugin for adding error bars to Line-, Barcharts or hierarchical Barcharts. This plugin also works with the [Hierarchical Scale Plugin](https://github.com/datavisyn/chartjs-scale-hierarchical).
 
@@ -142,12 +142,12 @@ npm run build
 
 ***
 
-<a href="https://www.datavisyn.io"><img src="https://www.datavisyn.io/img/logos/datavisyn-d-logo.png" align="left" width="100px" hspace="10" vspace="6"></a>
+<a href="https://www.datavisyn.io"><img src="https://www.datavisyn.io/img/logos/datavisyn-logo.png" align="left" width="200px" hspace="10" vspace="6"></a>
 This repository is part of the **Target Discovery Platform** (TDP). For tutorials, API docs, and more information about the build and deployment process, see the [documentation page](https://wiki.datavisyn.io).
 
 
-[datavisyn-image]: https://img.shields.io/badge/datavisyn-io-black.svg
-[datavisyn-url]: http://datavisyn.io
+[tdp-image]: https://img.shields.io/badge/Target%20Discovery%20Platform-Library-violet.svg 
+[tdp-url]: http://datavisyn.io
 [npm-image]: https://badge.fury.io/js/chartjs-plugin-error-bars.svg
 [npm-url]: https://npmjs.org/package/chartjs-plugin-error-bars
 [circleci-image]: https://circleci.com/gh/datavisyn/chartjs-plugin-error-bars.svg?style=shield
