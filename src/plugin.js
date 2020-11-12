@@ -202,6 +202,8 @@ const ErrorBarsPlugin = {
     barchartCoords.forEach((dataset, i) => {
       const vScale = this._resolveScale(chart, horizontal, i);
       dataset.forEach((bar) => {
+
+
         let cur = errorBarCoords[i];
         if (!cur) {
           return;
