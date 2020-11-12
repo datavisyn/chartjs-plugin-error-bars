@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-error-bars",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Error Bars Chart.js Plugin",
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
   "homepage": "https://datavisyn.io",
   "bugs": {
     "url": "https://github.com/datavisyn/chartjs-plugin-error-bars/issues"
-  }, 
+  },
   "files": [
     "build",
     "src/**/*.js"
