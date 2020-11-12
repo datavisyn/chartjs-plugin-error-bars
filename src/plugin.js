@@ -151,6 +151,19 @@ const ErrorBarsPlugin = {
   },
 
   /**
+   * resolve scale for current dataset from config and fallback to default scale
+   * @param chart chartjs instance
+   * @param horizontal orientation
+   * @param i dataset index
+   */
+  _resolveScale(chart, horizontal, i) {
+    const xAxisId = chart.data.datasets[i].xAxisID || 'x-axis-0';
+    const yAxisId = chart.data.datasets[i].yAxisID || 'y-axis-0';
+    const scaleId = horizontal ? xAxisId : yAxisId;
+    return chart.scales[scaleId];
+  },
+
+  /**
    * plugin hook to draw the error bars
    * @param chart chartjs instance
    * @param easingValue animation function
@@ -176,7 +189,6 @@ const ErrorBarsPlugin = {
 
     // determine value scale and orientation (vertical or horizontal)
     const horizontal = this._isHorizontal(chart);
-    const vScale = horizontal ? chart.scales['x-axis-0'] : chart.scales['y-axis-0'];
 
     const errorBarWidths = (Array.isArray(options.width) ? options.width : [options.width]).map((w) => this._computeWidth(chart, horizontal, w));
     const errorBarLineWidths = Array.isArray(options.lineWidth) ? options.lineWidth : [options.lineWidth];
@@ -188,13 +200,7 @@ const ErrorBarsPlugin = {
 
     // map error bar to barchart bar via label property
     barchartCoords.forEach((dataset, i) => {
-      if (chart.data.dataset[i]._meta != null && chart.data.dataset[i]._meta.length > 0) {
-        var hidden = chart.data.datasets[i]._meta[0].hidden;
-        if (hidden) {
-          return;
-        }
-      }
-
+      const vScale = this._resolveScale(chart, horizontal, i);
       dataset.forEach((bar) => {
 
 
@@ -202,13 +208,13 @@ const ErrorBarsPlugin = {
         if (!cur) {
           return;
         }
-        const hasLabelProperty = cur.hasOwnProperty(bar.label);
+        const hasLabelProperty = Object.hasOwnProperty.call(cur, bar.label);
         let errorBarData = null;
 
         // common scale such as categorical
         if (hasLabelProperty) {
           errorBarData = cur[bar.label];
-        } else if (!hasLabelProperty && bar.label && bar.label.label && cur.hasOwnProperty(bar.label.label)) {
+        } else if (!hasLabelProperty && bar.label && bar.label.label && Object.hasOwnProperty.call(cur, bar.label.label)) {
           // hierarchical scale has its label property nested in b.label object as b.label.label
           errorBarData = cur[bar.label.label];
         }
