@@ -1,4 +1,4 @@
-# Chart.js Error Bars Plugin
+# DEPRECATED: Chart.js Error Bars Plugin
 [![Target Discovery Platform][tdp-image]][tdp-url] [![NPM Package][npm-image]][npm-url] [![CircleCI][circleci-image]][circleci-url]
 
 [Chart.js](http://www.chartjs.org/) plugin for adding error bars to Line-, Barcharts or hierarchical Barcharts. This plugin also works with the [Hierarchical Scale Plugin](https://github.com/datavisyn/chartjs-scale-hierarchical).
@@ -8,6 +8,11 @@ Try the demo on [Codepen](https://codepen.io/sluger/pen/YjJKYy).
 ![selection_037](https://user-images.githubusercontent.com/5220584/43774415-4ab5ae88-9a49-11e8-813d-48d607d45225.png)
 ![selection_038](https://user-images.githubusercontent.com/5220584/43774418-4d08132e-9a49-11e8-9e90-723ef91783c7.png)
 ![selection_039](https://user-images.githubusercontent.com/5220584/43774420-4e7d7546-9a49-11e8-8cc9-67c63de96081.png)
+
+### DEPRECATION Information
+
+Please note that this project has been archived and is no longer being maintained. There is an active fork https://www.npmjs.com/package/chartjs-chart-error-bars and we will also contribute our future changes to it.
+
 
 ## Install
 ```bash
